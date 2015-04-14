@@ -18,9 +18,9 @@
   "homepage": "https://github.com/BuzzSpaceB/Space",
   
   "dependencies": {
-  "CSDS": "git://github.com/BuzzSpaceB/CSDS#master",
+  "CSDS": "https://github.com/BuzzSpaceB/CSDS/tarball/master",
   "mongoose": "^4.0.1",
-  "DatabaseStuff": "git://github.com/BuzzSpaceB/DatabaseStuff#master"
+  "DatabaseStuff": "https://github.com/BuzzSpaceB/DatabaseStuff/tarball/master"
   },
   "contributors": [
   {
