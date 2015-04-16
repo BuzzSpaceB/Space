@@ -5,7 +5,7 @@
  * @author Joseph Potgieter, u12003672
  * @author Tsepo Ntsaba, u10668544
  * @author Tebogo Seshibe, u13181442
- * @version 0.0.8
+ * @version 0.0.9
  */
 
 var dataSource = require( "DatabaseStuff" );
@@ -66,13 +66,12 @@ function createBuzzSpace( createBuzzSpaceRequest )
 
         else
         {
-            console.log( "1Yay" );
             var i = 0;
 
             for (i; i < arr.length; ++i) {
                 console.log( arr[ i ]  );
                 if (createBuzzSpaceRequest.user_id == arr[i].user_id) {
-                    //break;
+                    break;
                 }
             }
 
@@ -81,7 +80,6 @@ function createBuzzSpace( createBuzzSpaceRequest )
 
             else
             {
-                console.log( "2Yay" );
                 spaces.find(function (err, arr)
                 {
                     if (err)
@@ -92,14 +90,13 @@ function createBuzzSpace( createBuzzSpaceRequest )
                         console.log( arr );
                         var newSpace =
                         {
-                            root_thread_id: createBuzzSpaceRequest.root_thread_id,
+                            root_thread_id: null,
                             is_open: true,
                             academic_year: createBuzzSpaceRequest.academic_year,
                             moodule_id: createBuzzSpaceRequest.moodule_id,
                             __v: 0,
                             administrators: [],
                             registered_users: []
-
                         };
 
 
@@ -112,12 +109,11 @@ function createBuzzSpace( createBuzzSpaceRequest )
                             }
                         }
 
-                        if (j == arr.length) {
-
-                            console.log( "---------------\n", arr,"\n---------------" );
+                        if (j == arr.length) 
+                        {
                             spaces.collection.insert( newSpace, function()
                             {
-                                console.log( "---------------\n", arr,"\n---------------" );
+                                console.log( "New Buzz Space added" );
                             });
                         }
                     }
@@ -126,17 +122,13 @@ function createBuzzSpace( createBuzzSpaceRequest )
             }
         }
     });
-
-
-
-	//throw NotAuthorizedException;
 }
 
 /**
  *
  *  @description Function used to set a buzzspace inactive
  *  @param closeBuzzSpaceRequest An object containing: 
- * 	The username of the person making the request
+ * 	The user id of the person making the request
  *	The module id of the module to be closed
  */
 function closeBuzzSpace( closeBuzzSpaceRequest )
@@ -183,13 +175,76 @@ function closeBuzzSpace( closeBuzzSpaceRequest )
  *
  *  @description Function used to register a user to a buzzspace
  *  @param registerOnBuzzSpaceRequest An object containing: 
- *  	The username of the user attempting to register to the module
+ *  	The user id of the user attempting to register to the module
  *  	The module id of the module the user is registering to
  */
 function registerOnBuzzSpace( registerOnBuzzSpaceRequest )
 {
-	throw BuzzSpaceNotActiveException;
-	throw NotAuthorizedException;
+    spaces.find( function( err, arr )
+    {
+        if( err )
+            throw err;
+
+        else
+        {
+            var i = 0;
+
+            for( i; i < arr.length; ++i )
+            {
+                if( registerOnBuzzSpaceRequest.module_id === arr[ i ].module_id )
+                {
+
+
+                    if( arr[ i ].is_open )
+                    {
+                        var module = arr[ i ];
+                        console.log( module );
+
+                        users.find( function( err, array )
+                        {console.log(array.length);
+                            if( err )
+                                throw err;
+
+                            else
+                            {
+                                var j = 0;
+                                for( j; j < array.length; ++j )
+                                {
+                                    if( registerOnBuzzSpaceRequest.user_id == array[ j ].user_id )
+                                    {
+                                        var k = 0;
+                                        for( k; k < module.administrators.length; ++k )
+                                        {
+                                            if( registerOnBuzzSpaceRequest.user_id == module.administrators[ k ] )
+                                            {
+                                                module.collection.insert( array[ j ] );
+                                                console.log("New user added to BuzzSpace");
+                                                break;
+                                            }
+                                        }
+                                        if( k == module.administrators.length )
+                                            throw NotAuthorizedException;
+                                    }
+                                }
+
+                                if( j == array.length )
+                                    throw UserNotFound;
+                            }
+                        });
+                    }
+
+                    else
+                        throw BuzzSpaceNotActiveException;
+
+                    break;
+                }
+            }
+
+
+            if( i == arr.length )
+                throw BuzzSpaceNotExistsException;
+        }
+    });
 }
 
 
@@ -197,7 +252,7 @@ function registerOnBuzzSpace( registerOnBuzzSpaceRequest )
  *
  *  @description Function used to return the details of a user within the database
  *  @param getUserProfileRequest An object containing: 
- *  	The username of the user we are getting details of
+ *  	The user id of the user we are getting details of
  */
 function getUserProfile( getUserProfileRequest )
 {
@@ -207,7 +262,7 @@ function getUserProfile( getUserProfileRequest )
 		return query;
 	}
 
-	var query = getQuery( getUserProfile.username );
+	var query = getQuery( getUserProfile.user_id );
 	
 	var temp;
 
@@ -233,19 +288,3 @@ module.exports.createBuzzSpace = createBuzzSpace;
 module.exports.closeBuzzSpace = closeBuzzSpace;
 module.exports.registerOnBuzzSpace = registerOnBuzzSpace;
 module.exports.getUserProfile = getUserProfile;
-
-try {
-    createBuzzSpace
-    (
-        {
-            user_id: "u00000001",
-            root_thread_id: "cfe51ce51351a31e13f13a1",
-            academic_year: "2015",
-            module_id: "WST 111"
-        }
-    );
-}
-catch( e )
-{
-    console.log( e );
-}
