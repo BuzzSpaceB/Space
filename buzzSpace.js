@@ -5,7 +5,7 @@
  * @author Joseph Potgieter, u12003672
  * @author Tsepo Ntsaba, u10668544
  * @author Tebogo Seshibe, u13181442
- * @version 0.0.7
+ * @version 0.0.8
  */
 
 var dataSource = require( "DatabaseStuff" );
@@ -143,6 +143,40 @@ function closeBuzzSpace( closeBuzzSpaceRequest )
 {
 	throw BuzzSpaceNotExistsException;
 	throw NotAuthorizedException;
+	
+	var usr = closeBuzzSpaceRequest.user_id;
+	var spaceToClose = closeBuzzSpaceRequest.module_id;
+
+    spaces.find(function (err, docs) {
+        if (!err) {
+            var k = 0, q = 0;
+            for (i in docs) {
+                k++;
+
+                if (docs[i].module_id == spaceToClose) {
+                    var admins = docs[i].administrators;
+
+                    for (var j = 0; j < admins.length; ++j, ++q) {
+                        if (admins[j].user_id == usr) {
+                            docs[i].is_open = false;
+                            break;
+                        }
+                    }
+                    if (q == admins.length) {
+                        throw NotAuthorizedException;
+                    }
+
+
+                }
+            }
+
+            if (k == docs.length)
+                throw BuzzSpaceNotActiveException;
+            }
+        });
+	
+	
+	
 }
 
 /**
