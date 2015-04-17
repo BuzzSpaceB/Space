@@ -46,6 +46,13 @@ var BuzzSpaceNotActiveException =
     message:    "Unable to acces Buzz Space since it is closed", 
     toString:   function(){ return this.name + ": " + this.message; } 
 };
+var Success =
+{
+    name:       "Success",
+    message:    "Function succesfully completed",
+    toString:   function( str ){ return this.name + ": " + this.message + "\n" + str; }
+
+}
 
 
 /**
@@ -113,7 +120,7 @@ function createBuzzSpace( createBuzzSpaceRequest )
                         {
                             spaces.collection.insert( newSpace, function()
                             {
-                                console.log( "New Buzz Space added" );
+                                throw Succes.toString( "New Buzz Space added" );
                             });
                         }
                     }
@@ -142,7 +149,7 @@ function closeBuzzSpace( closeBuzzSpaceRequest )
     spaces.find(function (err, docs) {
         if (!err) {
             var k = 0, q = 0;
-            for (i in docs) {
+             for (i in docs) {
                 k++;
 
                 if (docs[i].module_id == spaceToClose) {
@@ -151,7 +158,7 @@ function closeBuzzSpace( closeBuzzSpaceRequest )
                     for (var j = 0; j < admins.length; ++j, ++q) {
                         if (admins[j].user_id == usr) {
                             docs[i].is_open = false;
-                            break;
+                            throw Succes.toString( "Buzzspace " + docs[ i].moodule_id + "closed" );
                         }
                     }
                     if (q == admins.length) {
@@ -218,7 +225,7 @@ function registerOnBuzzSpace( registerOnBuzzSpaceRequest )
                                             if( registerOnBuzzSpaceRequest.user_id == module.administrators[ k ] )
                                             {
                                                 module.collection.insert( array[ j ] );
-                                                console.log("New user added to BuzzSpace");
+                                                throw Succes.toString( "New user added to BuzzSpace" );
                                                 break;
                                             }
                                         }
@@ -256,31 +263,24 @@ function registerOnBuzzSpace( registerOnBuzzSpaceRequest )
  */
 function getUserProfile( getUserProfileRequest )
 {
-	function getQuery( _username )
-	{
-		var query = users.find().exec();
-		return query;
-	}
+    var returnUser;
+    var done = false;
 
-	var query = getQuery( getUserProfile.user_id );
-	
-	var temp;
+    users.find( function (err, arr) {
 
+        if (err)
+            returnUser = null;
 
-    temp = query.then
-    (
-        function (err, result)
-        {
-            //console.log( "--------------", err, "\n", result, "--------------" );
-            if (err)
-                return ( "err:"  + err.message );
+        else {
+            for( var i = 0; i < arr.length; ++i ) {
+                if (arr[i].user_id === getUserProfileRequest.user_id) {
+                    throw Success.toString("Found " + arr[ i ].username + " with user id: " + arr[i].user_id);
+                }
+            }
 
-            else
-                return result;
+            throw UserNotFound;
         }
-    );
-
-    console.log( query );
+    });
 }
 module.exports.users = users;
 module.exports.spaces = spaces;
@@ -288,3 +288,6 @@ module.exports.createBuzzSpace = createBuzzSpace;
 module.exports.closeBuzzSpace = closeBuzzSpace;
 module.exports.registerOnBuzzSpace = registerOnBuzzSpace;
 module.exports.getUserProfile = getUserProfile;
+module.exports.print = function( num ){ console.log( num ); };
+
+getUserProfile( { user_id: "u00000005" } );
