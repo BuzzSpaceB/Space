@@ -9,12 +9,6 @@
  */
 
 var buzz = require( "../buzzSpace" );
-var dataSource = require( "DatabaseStuff" );
-var mongoose = require( "mongoose" );
-dataSource.init( mongoose );
-
-var users = dataSource.models.user;
-var spaces = dataSource.models.space;
 
 var Godfrey, Joseph, Semaka, Tebogo, Tsepo;
 var MOD_001, MOD_010, MOD_011, MOD_100;
@@ -70,6 +64,7 @@ function add_users()
 
     /***************************************************************/
 
+    Semaka = users();
     Semaka.user_id = "u13081129";
     Semaka.username = "Semaka";
     Semaka.roles = 
@@ -92,6 +87,7 @@ function add_users()
 
     /***************************************************************/
 
+    Tebogo = users();
     Tebogo.user_id = "u13181442";
     Tebogo.username = "Tebogo";
     Tebogo.roles = 
@@ -114,6 +110,7 @@ function add_users()
 
     /***************************************************************/
 
+    Tsepo = users();
     Tsepo.user_id = "u10668544";
     Tsepo.username = "Tsepo";
     Tsepo.roles = 
@@ -368,49 +365,43 @@ function remove_test_data( test )
 }
 
 function testCreateBuzzSpace( test )
-{/*
-    for( var i = 0; i < Create.length; ++i )
-    {
-        test.equals( buzz.createBuzzSpace( Create[ i ].param ), Create[ i ].success );
-        test.done();
-    }*/
+{
+    test.equal( buzz.getUserProfile( { user_id: "u00000005", module_id: "COS371" } ), null );
     test.done();
 }
 
 function testCloseBuzzSpace( test )
-{/*
-    for( var i = 0; i < Close.length; ++i )
-    {
-        test.equals( buzz.closeBuzzSpace( Close[ i ].param ), Close[ i ].success );
-        test.done();
-    }*/
+{
+
+    test.equal( buzz.getUserProfile( { user_id: "u00000005", module_id: "COS371" } ), null );
+    test.done();
+    test.equal( buzz.getUserProfile( { user_id: "u00000005", module_id: "COS371" } ), null );
     test.done();
 }
 
 
 function testRegisterOnBuzzSpace( test )
-{/*
-    for( var i = 0; i < Register.length; ++i )
-    {
-        test.equals( buzz.registerOnBuzzSpace( Register[ i ].param ), Register[ i ].success );
-        test.done();
-    }*/
+{
+
+    test.equal( buzz.getUserProfile( { user_id: "u00000005", module_id: "COS301" } ), null );
+    test.done();
+
+    test.equal( buzz.getUserProfile( { user_id: "u00010005", module_id: "COS301" } ), null );
     test.done();
 }
 function testGetUserProfile( test )
-{/*
-    for( var i = 0; i < Get.length; ++i )
-    {
-        test.equals( buzz.getUserProfile( Get[ i ].param ), Get[ i ].success );
-        test.done();
-    }*/
+{
+    test.equal( buzz.getUserProfile( { user_id: "u00000005" } ), null );
+    test.done();
+
+    test.equal( buzz.getUserProfile( { user_id: "u00010005" } ), null );
     test.done();
 }
 
 
-module.exports.add_test_data = add_test_data;
+/*module.exports.add_test_data = add_test_data;
 module.exports.testCreateBuzzSpace = testCreateBuzzSpace;
-module.exports.testCloseBuzzSpace = testCloseBuzzSpace;
-module.exports.testRegisterOnBuzzSpace = testRegisterOnBuzzSpace;
+module.exports.testCloseBuzzSpace = testCloseBuzzSpace;*/
+//module.exports.testRegisterOnBuzzSpace = testRegisterOnBuzzSpace
 module.exports.testGetUserProfile = testGetUserProfile;
-module.exports.remove_test_data = remove_test_data;
+//module.exports.remove_test_data = remove_test_data;
